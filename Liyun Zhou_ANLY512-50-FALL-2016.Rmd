@@ -1,0 +1,82 @@
+---
+title: "ANLY 512 - Problem Set 3"
+author: "Liyun Zhou"
+date: "September 26, 2016"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Objectives
+
+The objectives of this problem set is to gain experience working with data visualization as a tool for understanding unfamiliar data. To do this I want you to submit four *vis* that reveal something interesting about either the included `movies.csv` dataset.  For each *vis*, include the code you used to create the plot (`echo=TRUE`), and a one paragraph description of what you found interesting.  In most analyses the first plot you try will not be the most informative and you will need to make multiple improvements to get a polished plot. To show this process, for one of your 4 *vis*, provide 3-5 iterations that lead you to the final plot.  
+
+Finally, upon completion name your final `.Rmd` file as: `YourName_PS2_ANLY512_SU2016.Rmd` and upload the link to the file from your GitHub repository to the "Problem Set 2"" assignmenet on Moodle.
+
+### Data Import & Cleanup
+```{r}
+library(dplyr)  # for easier filtering
+library(ggplot2)
+
+dat <- read.csv("C:/Users/Lexie/Desktop/HU/ANLY512/4/movie_data.csv")  # import the csv
+
+str(dat)    # Look at the structure of the data frame
+
+# Clean up some variables
+dat$Domestic <- as.numeric(dat$Domestic)   # Convert these columns to numeric
+dat$Worldwide <- as.numeric(dat$Worldwide)
+```
+
+### Multi-step Visualization
+
+Look at the number of IMDb.votes by release year.
+```{r}
+ggplot(dat, aes(Year, X..of.IMDb.votes)) +
+  geom_bar(stat = "identity")
+```
+
+The number of votes is very small on ealier year, I will try to look at year after 1997. 
+```{r}
+dat1 <- filter(dat, Year >= 1997)
+ggplot(dat1, aes(Year, X..of.IMDb.votes)) +
+  geom_bar(stat = "identity")
+```
+The vote quantity is sizable after year 1997. Then the ratings can be considered as accurate assessment.
+
+Then, look at the number of different film types along the year.
+```{r}
+ggplot(dat1, aes(Year)) +
+  geom_bar(aes(fill = Title.type))
+```
+From the stacked bar chart, Feature Film is the most released type. So I will focus on Feature Film only
+```{r}
+dat2 <- filter(dat1, Title.type =="Feature Film")
+ggplot(dat2, aes(Year, X..of.IMDb.votes)) +
+  geom_bar(stat = "identity")
+```
+
+Then let's see the if there is relationship between the ratings and Worldwide Earnings.
+```{r}
+ggplot(dat2, aes(IMDb.Rating, Worldwide)) +
+  geom_point() +
+  geom_smooth()
+```
+
+From the scatter plot we can see that, the IMDb.Rating doesn't have a linear relationship with Worldwide Earnings. 
+What about votes numbers?
+```{r}
+ggplot(dat2, aes(X..of.IMDb.votes, Worldwide)) +
+  geom_point() +
+  geom_smooth()
+```
+
+### Summary
+
+The result is interesting. When the number of votes is less than 250000, the more votes, the more earnings; when the number of votes is greater than 250000, the more votes, the less earnings. That makes me more curious that if there is any other factors that determine the worldwide earnings of movies if I have more relevant data.
+
+
+
+
+
